@@ -1,34 +1,45 @@
-const { get } = require("http");
-const picture = require("../models/picture");
-const Picture = require("../models/picture")
+// Importa o models Picture para interagir com o DB
+const Picture = require("../models/Picture");
 
-const fs = require("fs")
+// Importa o módulo fs para interagir com o sistema de arquivos
+const fs = require("fs");
 
+// Função para criar uma nova imagem no banco de dados
 exports.create = async (req, res) => {
-    res,json("OK!");
- 
-    try{
-        const { name} = req.body
+  try {
+    // Obtém o nome da img do corpo da requisição
+    const { name } = req.body;
 
-        const file = req.file
-        
-        const picture = new picture({
-            name,
-            src: file.path,
-        })
-        await picture.save()
+    // Obtém o arquivo da req. (Usado pelo Multer para fazer o Upload)
+    const file = req.file;
 
-        res.json({picture, msg: "imagen salva com suceso!"})
-    }catch (error){
-        res.status(500).json({message: "Erro ao salvar"});
-    }
+    // Cria uma nova instância com nome e caminho do arquivo
+    const picture = new Picture({
+      name,
+      src: file.path,
+    });
+
+    // Salva a imagem no DB
+    await picture.save();
+
+    // Retorna a resposta com a img. e uma msg. de sucesso
+    res.json({ picture, msg: "Imagem salva com sucesso!" });
+  } catch (err) {
+    // Em caso de erro, retorna uma msg. com erro 500
+    res.status(500).json({ message: "Erro ao salvar imagem!" });
+  }
 };
-exports.findAll = async (req, res) => {
-    try {
-        const pictures = await Picture.find()
 
-        res.json(pictures);
-    }catch (error)  {
-        res.status(500).json({message: "Erro ao buscar!" })
-    }
+// Função para encontrar todas as imagens no banco de dados
+exports.findAll = async (req, res) => {
+  try {
+    // Busca todas as imagens no banco de dados
+    const pictures = await Picture.find();
+
+    // Retorna todas as imagens do DB
+    res.json({ pictures, msg: "Imagens buscadas com sucesso!" });
+  } catch (err) {
+    // Em caso de erro, retorna uma resposta de erro com código 500
+    res.status(500).json({ message: "Erro ao buscar imagens!" });
+  }
 };
