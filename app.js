@@ -1,25 +1,40 @@
-// Importa o Express para criar o servidor e chamar as rotas
+// express para criar o servidor e defirnir rotas
 const express = require("express");
 
-// Cria uma instância do Express
+// Crio uma instancia do express
 const app = express();
 
-// Carrega as variáveis de ambiente do .ENV
+// carrega variaveis de ambientes do arquivo .ENV
 require("dotenv").config();
 
-// Estabelece a conexão com o DB
+// Estabelece a conexão com o DB, feito peo db.js
 require("./db");
 
-// Define a porta do servidor, ou do .ENV ou 3000 por padrão
+// Define a porta do servidor (.ENV ou 3000)
 const port = process.env.PORT || 3000;
 
-// Importa o roteador de imagens para gerenciar as rotas criadas
-const pictureRouter = require("./routers/picture");
+//importa o roteador de imagens para utilizar as rotas
+const PictureRouter = require("./routes/picture");
 
-// Define que todas as rotas são "localhost:3000/pictures"
-app.use("/pictures", pictureRouter);
+// Configurando o CORS
+app.use((req, res, next) => {
+  // Permite que qualquer origem, faça requisições para o servidor
+  res.header("Access-Control-Allow-Origin", "*");
+  // Permite os métodos GET, POST, DELETE
+  res.header("Access-Control-Allow-Methods", "GET, POST, DELETE");
+  // Permite que o cabeçalho Content-Type, seja enviado nas req.
+  res.header("Access-Control-Allow-Headers", "Content-Type");
 
-// Inicia o servidor, e exibe uma mensagem ao usuario
+  // Chama a próxima rota ou middlewares
+  next();
+});
+
+//define que todas rotas começam com pictures
+// Será tratafa os envios (get, post e etc), pelo pictureRouter
+// ex: http://localhost:4000/pictures
+app.use("/pictures", PictureRouter);
+
+// Inicia o servidor na porta definida
 app.listen(port, () => {
-  console.log(`O servidor executa na porta ${port}`);
+  console.log(`Servidor executando na porta ${port}`);
 });
